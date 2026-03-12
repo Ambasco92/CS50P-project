@@ -268,10 +268,14 @@ Output:
 
 ```
 project.py
+test_project.py
+requirement.txt
 README.md
 ```
 
 * `project.py` – Contains all date utility functions
+* `tets_project.py` – Contains all the tests for my functions using Pytest
+* `requirement.txt` – List of python modules used in the project
 * `README.md` – Project documentation
 
 ---
@@ -307,10 +311,3 @@ Potential improvements for the project include:
 * Adding more formatting options
 * Building a command-line interface with more interactive features
 
----
-
-If you want, I can also help you:
-
-✅ Make this **longer (CS50 graders like detailed READMEs)**
-✅ Add **sections that help you get full marks**
-✅ Fix **a small bug in your code I noticed** (there is one in `date_name()` 👀).
