@@ -295,8 +295,6 @@ def date_format(date_str: str, d_format: str = 'dd') -> str | TypeError:
 def date_add(date_str: str, interval=0, unit='days'):
     if not is_date(date_str):
         raise TypeError("Invalid date")
-    if not is_date(date_str):
-        raise TypeError("Invalid date format")
 
     pattern = r'^(\d{4})-?(\d{2})?-?(\d{2})?$'
     match = re.fullmatch(pattern, date_str)
@@ -320,13 +318,16 @@ def date_add(date_str: str, interval=0, unit='days'):
     try:
         return mapping[unit]
     except KeyError:
-        raise TypeError("Invalid value for date_add, unit expects: ['days', 'weeks', 'months', 'years']")
+        raise TypeError(
+            "Invalid unit. Choose from ['days', 'weeks', 'months', 'years']"
+        )
 
 
 
 
-def date_diff(start_date: str, end_date: str, unit: str = 'day') -> int | TypeError:
-    if not (is_date(start_date) or is_date(end_date)):
+def date_diff(start_date: str, end_date: str, unit: str = 'days') -> int:
+
+    if not (is_date(start_date) and is_date(end_date)):
         raise TypeError("Invalid date")
 
     dt1 = date(
@@ -341,18 +342,21 @@ def date_diff(start_date: str, end_date: str, unit: str = 'day') -> int | TypeEr
         day=int(day(end_date))
     )
 
+    diff = relativedelta(dt2, dt1)
+
     mapping = {
         'days': abs((dt2 - dt1).days),
-        'weeks': (dt2 - dt1).days // 7,
-        'months': relativedelta(dt1, dt2).months,
-        'years': relativedelta(dt1, dt2).years
+        'weeks': abs((dt2 - dt1).days) // 7,
+        'months': abs(diff.years * 12 + diff.months),
+        'years': abs(diff.years)
     }
 
     try:
         return mapping[unit]
     except KeyError:
-        raise TypeError("Invalid value for date_add, unit expects: ['days', 'weeks', 'months', 'years']")
-
+        raise TypeError(
+            "Invalid unit. Choose from ['days', 'weeks', 'months', 'years']"
+        )
 
 def main():
 
@@ -362,3 +366,4 @@ def main():
 
 if __name__ == '__main__':
     main()
+
