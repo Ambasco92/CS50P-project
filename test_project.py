@@ -90,7 +90,7 @@ def test_date_add():
 def test_date_diff():
     assert date_diff("2026-10-30", '2026-10-30', 'days') == 0
     assert date_diff("2026-10-30", '2026-10-10', 'days') == 20
-    assert date_diff("2026-10-30", '2026-10-30', 'months') == 0
+    assert date_diff("2026-10-30", '2027-10-30', 'months') == 12
     assert date_diff("2026-10-30", '2025-10-30', 'months') == 12
     assert date_diff("2026-10-30", '2016-10-30', 'years') == 10
 
