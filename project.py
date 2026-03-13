@@ -13,7 +13,6 @@ def day(date_str: str) -> int | None:
         return int(match.group(1))
     return None
 
-
 def month(date_str: str) -> int | None:
     if not is_date(date_str):
         raise TypeError("Invalid date")
@@ -23,7 +22,6 @@ def month(date_str: str) -> int | None:
         return int(match.group(1))
     return None
 
-
 def year(date_str: str) -> int | None:
     if not is_date(date_str):
         raise TypeError("Invalid date")
@@ -32,7 +30,6 @@ def year(date_str: str) -> int | None:
     if match := re.search(pattern, date_str):
         return int(match.group(1))
     return None
-
 
 def week(date_str: str) -> int:
     if not is_date(date_str):
@@ -45,7 +42,6 @@ def week(date_str: str) -> int:
     )
     return dt.isocalendar()[1]
 
-
 def week_day(date_str: str) -> int:
     if not is_date(date_str):
         raise TypeError("Invalid date")
@@ -56,12 +52,10 @@ def week_day(date_str: str) -> int:
     )
     return dt.weekday()
 
-
 def quarter(date_str: str) -> int:
     if not is_date(date_str):
         raise TypeError("Invalid date")
     return (month(date_str) - 1) // 3 + 1
-
 
 def day_of_week(date_str: str) -> str:
     if not is_date(date_str):
@@ -73,7 +67,6 @@ def day_of_week(date_str: str) -> str:
     )
     return dt.strftime("%A")
 
-
 def day_of_year(date_str: str) -> int:
     if not is_date(date_str):
         raise TypeError("Invalid date")
@@ -83,7 +76,6 @@ def day_of_year(date_str: str) -> int:
         day=int(day(date_str))
     )
     return int(dt.strftime("%j"))
-
 
 def is_date(date_str: str) -> bool:
     pattern = r'^\d{4}-?(?:\d{2})?-?(?:\d{2})?$'
@@ -135,7 +127,6 @@ def date_part(date_str: str, part: str = 'year') -> int:
         raise TypeError(
             "Invalid argument for date_part, part: expects ['day', 'month', 'year', 'week', 'week_day', 'quarter']")
 
-
 def date_name(date_str: str, part: str = 'month') -> str:
     """
         Returns a string representation of a specific part of a date.
@@ -172,7 +163,7 @@ def date_name(date_str: str, part: str = 'month') -> str:
     except KeyError:
         raise TypeError("Invalid argument for date_name, part: expects ['day', 'month', 'year', 'day_of_week']")
 
-def date_trunc(date_str: str, arg: str = 'year') -> str | None:
+def date_trunc(date_str: str, arg: str = 'year') -> str:
     """
         Truncate a date string to the start of the day, month, or year.
 
@@ -182,7 +173,6 @@ def date_trunc(date_str: str, arg: str = 'year') -> str | None:
 
         Returns:
             str: The truncated date string.
-            None: If input format is invalid.
 
         Raises:
             TypeError: If `arg` is not 'day', 'month', or 'year'.
@@ -195,10 +185,10 @@ def date_trunc(date_str: str, arg: str = 'year') -> str | None:
     if not is_date(date_str):
         raise TypeError("Invalid date format")
 
-    pattern = r'^(\d{4})-?(\d{2})?-?(\d{2})?$'
+    pattern = r'^(\d{4})-(\d{2})-(\d{2})$'
     match = re.fullmatch(pattern, date_str)
 
-    if not match:
+    if match:
         dt = date(
             year=int(year(date_str)),
             month=int(month(date_str)),
@@ -215,7 +205,7 @@ def date_trunc(date_str: str, arg: str = 'year') -> str | None:
             return mapping[arg]
         except KeyError:
             raise TypeError("Invalid argument for date_trunc, arg: expects ['year', 'month', 'day']")
-    return f"{year(date_str)}-01-01"
+    return f"{date_str}-01-01"
 
 def end_of_month(date_str: str) -> str:
     """
@@ -292,40 +282,36 @@ def date_format(date_str: str, d_format: str = 'dd') -> str | TypeError:
     except KeyError:
         raise TypeError("Invalid Key for d_format")
 
-def date_add(date_str: str, interval=0, unit='days'):
+def date_add(date_str: str, interval=0, unit: str='days') -> str | TypeError:
     if not is_date(date_str):
         raise TypeError("Invalid date")
 
-    pattern = r'^(\d{4})-?(\d{2})?-?(\d{2})?$'
+    pattern = r'^(\d{4})-(\d{2})-(\d{2})$'
     match = re.fullmatch(pattern, date_str)
 
     if match:
-        date_str = date_trunc(date_str)
-
-    dt = date(
-        year=int(year(date_str)),
-        month=int(month(date_str)),
-        day=int(day(date_str))
-    )
-
-    mapping = {
-        'days': dt + timedelta(days=interval),
-        'weeks': dt + timedelta(weeks=interval),
-        'months': dt + relativedelta(months=interval),
-        'years': dt + relativedelta(years=interval)
-    }
-
-    try:
-        return mapping[unit]
-    except KeyError:
-        raise TypeError(
-            "Invalid unit. Choose from ['days', 'weeks', 'months', 'years']"
+        dt = date(
+            year=int(year(date_str)),
+            month=int(month(date_str)),
+            day=int(day(date_str))
         )
 
+        mapping = {
+            'days': dt + timedelta(days=interval),
+            'weeks': dt + relativedelta(weeks=interval),
+            'months': dt + relativedelta(months=interval),
+            'years': dt + relativedelta(years=interval)
+        }
 
+        try:
+            return mapping[unit].isoformat()
+        except KeyError:
+            raise TypeError(
+                "Invalid unit. Choose from ['days', 'weeks', 'months', 'years']"
+            )
+    return date_add(date_trunc(date_str), interval, unit)
 
-
-def date_diff(start_date: str, end_date: str, unit: str = 'days') -> int:
+def date_diff(start_date: str, end_date: str, unit: str = 'days') -> int | TypeError:
 
     if not (is_date(start_date) and is_date(end_date)):
         raise TypeError("Invalid date")
@@ -360,10 +346,9 @@ def date_diff(start_date: str, end_date: str, unit: str = 'days') -> int:
 
 def main():
 
-    dt1 = input("Date1: ")
-    dt2 = input("Date2: ")
-    print(date_diff(dt1, dt2, 'days'))
+    dt = input("Date: ")
+
+    print(date_add(dt, 10, 'days'))
 
 if __name__ == '__main__':
     main()
-
